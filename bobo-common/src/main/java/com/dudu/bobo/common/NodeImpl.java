@@ -1,8 +1,6 @@
-package com.dudu.bobo.client.support;
+package com.dudu.bobo.common;
 
 import java.net.InetSocketAddress;
-
-import com.dudu.bobo.common.Node;
 
 /**
  * 

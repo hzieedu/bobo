@@ -1,7 +1,7 @@
 package com.dudu.bobo.server;
 
 import com.dudu.bobo.common.Node;
-import com.dudu.bobo.common.RpcResponse;
+import com.dudu.bobo.common.Message;
 
 /***
  * 
@@ -13,5 +13,5 @@ public interface ServingConnector {
 	/**
 	 * 
 	 */
-	void response(Node target, RpcResponse response);
+	void response(Node target, Message message);
 }

@@ -7,4 +7,12 @@ package com.dudu.bobo.server.support;
  */
 public class Framework {
 
+	/**
+	 * 
+	 */
+	public void main() {
+		// 通信模块
+		
+		// 处理模块
+	}
 }

@@ -1,9 +1,11 @@
 package com.dudu.bobo.server.support;
 
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import com.dudu.bobo.common.Message;
 import com.dudu.bobo.common.Node;
 import com.dudu.bobo.common.RpcRequest;
 import com.dudu.bobo.common.RpcResponse;
@@ -20,13 +22,13 @@ import com.dudu.bobo.server.ServingConnector;
 public class ExecutorImpl implements Executor {
 	private static volatile ExecutorImpl instance = null;
 	
-	public static ExecutorImpl getExecutor() {
+	public static ExecutorImpl getExecutor(ServingConnector connector) {
 		/*
 		 * double check lock
 		 */
 		if (instance == null) {
 			synchronized(ExecutorImpl.class) {
-				ExecutorImpl executor = new ExecutorImpl();
+				ExecutorImpl executor = new ExecutorImpl(connector);
 				executor.start();
 				instance = executor;
 			}
@@ -35,22 +37,22 @@ public class ExecutorImpl implements Executor {
 		return instance;
 	}
 	
-	ServingConnector			server = ServingConnectorImpl.getServer();
+	private final ServingConnector		connector;
 		
-	BlockingQueue<RpcContext>	queue = new LinkedBlockingQueue<RpcContext>();
+	BlockingQueue<MessageWithSource>	queue = new LinkedBlockingQueue<MessageWithSource>();
 
-	RpcSkeletonContainer		serviceConainer;
+	RpcSkeletonContainer	serviceConainer;
 
-	class RpcContext {
-		RpcRequest	rpcRequest;
+	class MessageWithSource {
+		Message		message;
 		Node		node;
-		public RpcContext(RpcRequest rpcRequest, Node src) {
-			this.rpcRequest = rpcRequest;
+		public MessageWithSource(Message message, Node src) {
+			this.message = message;
 			this.node = src;
 		}
 	
-		RpcRequest getRpcRequest() {
-			return this.rpcRequest;
+		Message getMessage() {
+			return this.message;
 		}
 		
 		Node getNode() {
@@ -58,18 +60,26 @@ public class ExecutorImpl implements Executor {
 		}
 	}
 	
+	public ExecutorImpl(ServingConnector connector) {
+		this.connector = connector;
+	}
+
 	class ProcessProcedure implements Runnable {
 		public void run() {
 			while (true) {
 				try {
-					RpcContext r = queue.poll(10, TimeUnit.MILLISECONDS);
-					if (r == null) {
+					MessageWithSource req = queue.poll(10, TimeUnit.MILLISECONDS);
+					if (req == null) {
 						continue;
 					}
-					RpcRequest request = r.getRpcRequest();
+					Object messageBody = req.getMessage().getMessageBody();
+					if (messageBody instanceof RpcRequest == false) {
+						continue;
+					}
+					RpcRequest request = (RpcRequest)messageBody;
 					RpcSkeleton skeleton = serviceConainer.getRpcSkeleton(request.getClassName());
 					RpcResponse response = skeleton.handle(request);
-					server.response(r.getNode(), response);
+					connector.response(req.getNode(), new Message(req.getMessage().getMessageId(), response));
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -88,7 +98,7 @@ public class ExecutorImpl implements Executor {
 		}
 	}
 	
-	public void dispatch(RpcRequest rpcRequest, Node src) throws Exception {
-		queue.add(new RpcContext(rpcRequest, src));
+	public void dispatch(Message message, Node src) throws IOException {
+		queue.add(new MessageWithSource(message, src));
 	}
 }

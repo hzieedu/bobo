@@ -1,7 +1,10 @@
 package com.dudu.bobo.server;
 
 import com.dudu.bobo.common.Node;
-import com.dudu.bobo.common.RpcRequest;
+
+import java.io.IOException;
+
+import com.dudu.bobo.common.Message;
 
 /**
  * 
@@ -12,9 +15,9 @@ public interface Executor {
 
 	/**
 	 * 
-	 * @param rpcRequest
+	 * @param message
 	 * @param src
 	 * @throws Exception
 	 */
-	void dispatch(RpcRequest rpcRequest, Node src) throws Exception;
+	void dispatch(Message message, Node src) throws IOException;
 }
