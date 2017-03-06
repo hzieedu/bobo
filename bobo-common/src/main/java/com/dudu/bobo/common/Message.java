@@ -20,6 +20,10 @@ public class Message implements Serializable {
 	private Object				messageBody;
 
 	private transient Object	attachment;
+	
+	public Message() {
+		
+	}
 
 	public Message(Long id, Object body) {
 		messageId = id;
@@ -58,5 +62,9 @@ public class Message implements Serializable {
 	
 	public Object getAttachment() {
 		return this.attachment;
+	}
+	
+	public void setAttachment(Object attachment) {
+		this.attachment = attachment;
 	}
 }

@@ -39,26 +39,9 @@ public class ExecutorImpl implements Executor {
 	
 	private final ServingConnector		connector;
 		
-	BlockingQueue<MessageWithSource>	queue = new LinkedBlockingQueue<MessageWithSource>();
+	BlockingQueue<Message>	queue = new LinkedBlockingQueue<Message>();
 
 	RpcSkeletonContainer	serviceConainer;
-
-	class MessageWithSource {
-		Message		message;
-		Node		node;
-		public MessageWithSource(Message message, Node src) {
-			this.message = message;
-			this.node = src;
-		}
-	
-		Message getMessage() {
-			return this.message;
-		}
-		
-		Node getNode() {
-			return this.node;
-		}
-	}
 	
 	public ExecutorImpl(ServingConnector connector) {
 		this.connector = connector;
@@ -68,23 +51,21 @@ public class ExecutorImpl implements Executor {
 		public void run() {
 			while (true) {
 				try {
-					MessageWithSource req = queue.poll(10, TimeUnit.MILLISECONDS);
+					Message req = queue.poll(10, TimeUnit.MILLISECONDS);
 					if (req == null) {
 						continue;
 					}
-					Object messageBody = req.getMessage().getMessageBody();
+					Object messageBody = req.getMessageBody();
 					if (messageBody instanceof RpcRequest == false) {
 						continue;
 					}
 					RpcRequest request = (RpcRequest)messageBody;
 					RpcSkeleton skeleton = serviceConainer.getRpcSkeleton(request.getClassName());
 					RpcResponse response = skeleton.handle(request);
-					connector.response(req.getNode(), new Message(req.getMessage().getMessageId(), response));
+					connector.response((Node)req.getAttachment(), new Message(req.getMessageId(), response));
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -97,8 +78,9 @@ public class ExecutorImpl implements Executor {
 			t.start();
 		}
 	}
-	
+
 	public void dispatch(Message message, Node src) throws IOException {
-		queue.add(new MessageWithSource(message, src));
+		message.setAttachment(src);
+		queue.add(message);
 	}
 }

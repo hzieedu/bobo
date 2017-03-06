@@ -15,7 +15,8 @@ public class NodeImpl implements Node {
 		this.addr = addr;
 	}
 	
-	public InetSocketAddress getAddr() {
+	@Override
+	public InetSocketAddress getAddress() {
 		return this.addr;
 	}
 	

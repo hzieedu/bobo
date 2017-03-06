@@ -2,6 +2,7 @@ package com.dudu.bobo.client;
 
 import java.util.concurrent.Future;
 
+import com.dudu.bobo.common.Message;
 import com.dudu.bobo.common.Node;
 
 /**
@@ -17,17 +18,17 @@ public interface ClientConnector {
 	 * @param request
 	 * @return
 	 */
-	Future<?> send(Node target, Object request);
+	Future<?> send(Node target, Message request);
 
 	/**
 	 * 
 	 * @return
 	 */
-	Object sendAndReceive(Node target, Object request) throws Exception;
+	Message sendAndReceive(Node target, Message request) throws Exception;
 	
 	/**
 	 * 
 	 * @return
 	 */
-	Object sendAndReceive(Node target, Object request, long timeout) throws Exception;	
+	Message sendAndReceive(Node target, Message request, long timeout) throws Exception;	
 }

@@ -1,21 +1,11 @@
 package com.dudu.bobo.server.support;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.dudu.bobo.common.ChannelWrapper;
 import com.dudu.bobo.common.Message;
 import com.dudu.bobo.common.Node;
-import com.dudu.bobo.common.RpcRequest;
 import com.dudu.bobo.server.Executor;
 import com.dudu.bobo.server.ServingConnector;
 
@@ -54,7 +43,7 @@ public class ServingConnectorImpl implements ServingConnector, Runnable {
 	private Executor	executor;
 	private Selector	selector = null;
 
-	private InetSocketAddress servingAddress;
+	private Node		serverHost;
 
 	Map<Node, ChannelWrapper> channelMap = new ConcurrentHashMap<Node, ChannelWrapper>();
 	
@@ -64,7 +53,7 @@ public class ServingConnectorImpl implements ServingConnector, Runnable {
 
 			ServerSocketChannel servingChannel = ServerSocketChannel.open();  
 			servingChannel.configureBlocking(false);
-			servingChannel.bind(servingAddress);
+			servingChannel.bind(serverHost.getAddress());
 
 	        // 通过open()方法找到Selector
 	        selector = Selector.open();  
@@ -109,9 +98,10 @@ public class ServingConnectorImpl implements ServingConnector, Runnable {
 	            		client.register(selector, SelectionKey.OP_READ, clientChannel);
 	            	} else if (selectionKey.isReadable()) {
 	            		ChannelWrapper clientChannel = (ChannelWrapper) selectionKey.attachment();
-	                    Message message = clientChannel.read();
-	                    RpcRequest request = (RpcRequest)message.getMessageBody();
-	                    executor.dispatch(message, clientChannel.getPeer());
+	                    for (Message message = clientChannel.read();
+	                    		message != null; message = clientChannel.read()) {
+	                    	executor.dispatch(message, clientChannel.getPeer());
+	                    }
 	                } else if (selectionKey.isWritable()) {
 	                	ChannelWrapper clientChannel = (ChannelWrapper)selectionKey.attachment();
 	                	clientChannel.write();
@@ -126,7 +116,6 @@ public class ServingConnectorImpl implements ServingConnector, Runnable {
 	            	}
 	            }
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} 	

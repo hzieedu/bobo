@@ -1,4 +1,4 @@
-package com.dudu.bobo.client.support.spring;
+package com.dudu.bobo.spring;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -12,7 +12,7 @@ import com.dudu.bobo.client.support.ProxyFactoryImpl;
  *
  * @param <T>
  */
-public class BoboReferenceBean<T> implements FactoryBean, InitializingBean {
+public class ReferenceBean<T> implements FactoryBean, InitializingBean {
 
 	private String			id;
 	

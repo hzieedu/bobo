@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:bobo="http://www.dudu.com/schema/bobo"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    classpath:/org/springframework/beans/factory/xml/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context
+    classpath:/org/springframework/context/config/spring-context-2.5.xsd
+    http://www.dudu.com/schema/bobo
+    http://www.dudu.com/schema/bobo/bobo.xsd">
+
+    <bobo:reference id="demoService" interface="com.dudu.boboclientdemo.DemoService" />
+</beans>

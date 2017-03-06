@@ -12,6 +12,12 @@ public interface RpcSkeleton {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	Class<?> getInterfaceClass();
+	
+	/**
+	 * 
 	 * @throws Exception
 	 */
 	RpcResponse handle(RpcRequest request) throws Exception;

@@ -14,7 +14,7 @@ import com.dudu.bobo.server.RpcSkeleton;
  * @author liangy43
  *
  */
-public class RpcSkeletonContainer implements ApplicationContextAware {
+public class RpcSkeletonContainer {
 
 	private static volatile RpcSkeletonContainer instance = null;
 	
@@ -35,18 +35,17 @@ public class RpcSkeletonContainer implements ApplicationContextAware {
 
 	Map<String, RpcSkeleton>	skeletonMap = new ConcurrentHashMap<String, RpcSkeleton>();
 
-	ApplicationContext			applicationContext;
+	/**
+	 *
+	 */
+	public void registerRpcSkeleton(RpcSkeleton rpcSkeleton) {
+		skeletonMap.put(rpcSkeleton.getClass().getName(), rpcSkeleton);
+	}
 
 	/**
 	 * 
 	 */
-	RpcSkeleton getRpcSkeleton(String className) {
+	public RpcSkeleton getRpcSkeleton(String className) {
 		return skeletonMap.get(className);
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		// TODO Auto-generated method stub
-		this.applicationContext = applicationContext;
 	}
 }

@@ -1,4 +1,4 @@
-package com.dudu.bobo.client.support.spring;
+package com.dudu.bobo.spring;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -11,11 +11,11 @@ import org.w3c.dom.Element;
  * @author liangy43
  *
  */
-public class BoboBeanDefinitionParser implements BeanDefinitionParser {
+public class ReferenceBeanDefinitionParser implements BeanDefinitionParser {
 
 	private final Class<?> beanClass;
 	
-	public BoboBeanDefinitionParser(Class<?> beanClass) {
+	public ReferenceBeanDefinitionParser(Class<?> beanClass) {
 		this.beanClass = beanClass;
 	}
 	

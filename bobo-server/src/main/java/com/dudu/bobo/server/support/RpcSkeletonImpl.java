@@ -13,9 +13,18 @@ import com.dudu.bobo.server.RpcSkeleton;
  */
 public class RpcSkeletonImpl implements RpcSkeleton{
 	
-	private Class<?>	clazz;
+	private final Class<?>	clazz;
 	
-	private Object 		service;
+	private final Object 	service;
+	
+	public RpcSkeletonImpl(Object service, Class<?> clazz) {
+		this.service = service;
+		this.clazz = clazz;
+	}
+
+	public Class<?> getInterfaceClass() {
+		return this.clazz;
+	}
 	
 	/**
 	 * 

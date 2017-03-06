@@ -10,11 +10,11 @@ import java.util.concurrent.TimeoutException;
  * @author liangy43
  *
  */
-public class FutureImpl implements Future {
+public class FutureImpl<T> implements Future<T> {
 
-	private volatile Object obj = null;
+	private volatile T obj = null;
 
-	public void signal(Object obj) {
+	public void signal(T obj) {
 		this.obj = obj;
 		this.notify();
 	}
@@ -37,7 +37,7 @@ public class FutureImpl implements Future {
 	}
 
 	@Override
-	public Object get() throws InterruptedException, ExecutionException {
+	public T get() throws InterruptedException, ExecutionException {
 		try {
 			return get(-1, TimeUnit.MILLISECONDS);
 		} catch (TimeoutException e) {
@@ -48,7 +48,7 @@ public class FutureImpl implements Future {
 	}
 
 	@Override
-	public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+	public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 		this.wait(timeout);
 		return obj;
 	}
