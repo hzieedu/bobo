@@ -10,5 +10,6 @@
 		<module>bobo-client</module>
 		<module>bobo-client-demo</module>
 		<module>bobo-common</module>
+		<module>bobo-server-demo</module>
 	</modules>
 </project>
