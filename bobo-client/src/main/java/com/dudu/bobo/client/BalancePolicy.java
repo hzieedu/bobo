@@ -1,14 +1,14 @@
 package com.dudu.bobo.client;
 
 /**
- * ¸ºÔØ¾ùºâ²ßÂÔ
+ * è´Ÿè½½å‡è¡¡ç­–ç•¥
  * 
  * @author liangy43
  *
  */
 public interface BalancePolicy {
 	/**
-	 * ½«´æ¸ù¶ÔÏó¼ÓÈë¼¯Èº
+	 * å°†å­˜æ ¹å¯¹è±¡åŠ å…¥é›†ç¾¤
 	 */
 	void join(RpcStub stub);
 
@@ -23,13 +23,13 @@ public interface BalancePolicy {
 	RpcStub select();
 
 	/**
-	 * ÖÃÒÉÖ¸¶¨´æ¸ù
+	 * ç½®ç–‘æŒ‡å®šå­˜æ ¹
 	 * 
 	 */
 	void doubt(RpcStub stub);
 
 	/**
-	 * È¡ÏûÖ¸¶¨´æ¸ùÖÃÒÉ
+	 * å–æ¶ˆæŒ‡å®šå­˜æ ¹ç½®ç–‘
 	 * 
 	 */
 	void unDoubt(RpcStub stub);

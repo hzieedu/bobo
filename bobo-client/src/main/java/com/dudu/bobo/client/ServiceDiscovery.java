@@ -5,7 +5,7 @@ import java.util.List;
 import com.dudu.bobo.common.ServiceInfo;
 
 /**
- * 服务发现
+ * 鏈嶅姟鍙戠幇
  * 
  * @author liangy43
  *

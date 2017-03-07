@@ -72,6 +72,6 @@ public class ReferenceBean<T> implements FactoryBean, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		interfaceClass = Class.forName(interfaceName);
-		System.out.println(String.format("´úÀí[%s]ÒıÓÃµÄ½Ó¿Ú[%s]ÕÒµ½ÁË!", id, interfaceName));
+		System.out.println(String.format("ä»£ç†[%s]å¼•ç”¨çš„æ¥å£[%s]æ‰¾åˆ°äº†!", id, interfaceName));
 	}
 }

@@ -15,7 +15,7 @@ public class RpcStubImpl implements RpcStub {
 	
 	private ClientConnector	client;
 
-	// ÓÃÓÚÇëÇó-Ó¦´ğÆ¥Åä, ²»ÄÜÖØ¸´ÇÒ´æÔÚ¾ºÕùÌõ¼ş, ¹Ê¶øÊ¹ÓÃÔ­×ÓÀàĞÍ
+	// ç”¨äºè¯·æ±‚-åº”ç­”åŒ¹é…, ä¸èƒ½é‡å¤ä¸”å­˜åœ¨ç«äº‰æ¡ä»¶, æ•…è€Œä½¿ç”¨åŸå­ç±»å‹
 	private static AtomicLong reqId = new AtomicLong(0);
 
 	public RpcStubImpl(Node node) {

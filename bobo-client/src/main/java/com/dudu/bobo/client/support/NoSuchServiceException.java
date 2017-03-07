@@ -1,5 +1,8 @@
 package com.dudu.bobo.client.support;
 
+/**
+ *
+ */
 public class NoSuchServiceException extends Exception {
 
 	/**

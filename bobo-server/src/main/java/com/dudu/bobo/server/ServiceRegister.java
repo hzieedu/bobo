@@ -1,7 +1,7 @@
 package com.dudu.bobo.server;
 
 /**
- * ·şÎñ×¢²á
+ * æœåŠ¡æ³¨å†Œ
  * 
  * @author liangy43
  *

@@ -17,158 +17,156 @@ import com.dudu.bobo.common.ChannelWrapper;
 import com.dudu.bobo.common.Message;
 import com.dudu.bobo.common.Node;
 
-
 /**
- * Í¨ĞÅ¿Í»§¶Ë, ÊµÏÖIO¶àÂ·¸´ÓÃÒÔ¼°ÇëÇó-Ó¦´ğµÄÆ¥Åä
- * 
+ * é€šä¿¡å®¢æˆ·ç«¯, å®ç°IOå¤šè·¯å¤ç”¨ä»¥åŠè¯·æ±‚-åº”ç­”çš„åŒ¹é…
+ *
  * @author liangy43
  *
  */
 public class ClientConnectorImpl implements ClientConnector, Runnable {
-	
-	private static volatile ClientConnector instance = null;
-	
-	public static ClientConnector getClient() {
-		/*
-		 * double check lock
-		 */
-		if (instance == null) {
-			synchronized(ClientConnectorImpl.class) {
-				ClientConnectorImpl client = new ClientConnectorImpl();
-				client.init();
-				instance = client;
-			}
-		}
 
-		return instance;
-	}
+    private static volatile ClientConnector instance = null;
 
-	private Map<Node, ChannelWrapper> channelMap
-						= new ConcurrentHashMap<Node, ChannelWrapper>();
+    public static ClientConnector getClient() {
+        /*
+         * double check lock
+         */
+        if (instance == null) {
+            synchronized (ClientConnectorImpl.class) {
+                ClientConnectorImpl client = new ClientConnectorImpl();
+                client.init();
+                instance = client;
+            }
+        }
 
-	// ÓÃÓÚÇëÇóÓ¦´ğÆ¥ÅäµÄfutureÈİÆ÷
-	Map<Long, FutureImpl<Message>> pendingQueue
-						= new ConcurrentHashMap<Long, FutureImpl<Message>>();
-	
-	private Selector selector = null;
-	
-	private void init() {
-		try {
-			// ³õÊ¼»¯selector¶ÔÏó
-			selector = Selector.open();
-			
-			// Æô¶¯Í¨ĞÅÏß³Ì
-			Thread t = new Thread(this);
-			t.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+        return instance;
+    }
 
-	public boolean isConnected(Node node) {
-		return channelMap.containsKey(node);
-	}
+    private Map<Node, ChannelWrapper> channelMap
+        = new ConcurrentHashMap<Node, ChannelWrapper>();
 
-	public int open(Node node) {
-		try {
-			// ´ò¿ª
-			SocketChannel channel = SocketChannel.open();
-			// ÉèÖÃ·Ç×èÈû
-			channel.configureBlocking(false);
-			channel.register(selector, SelectionKey.OP_CONNECT);
-			// Á¬½Ó
-			channel.connect(node.getAddress());
-		} catch (ClosedChannelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return 0;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	@Override
-	public Future<Message> send(Node target, Message request) {
-		FutureImpl<Message> future = new FutureImpl<Message>();
-		pendingQueue.put(request.getMessageId(), future);
-		channelMap.get(target).sendMessage(request);
-		return future;
-	}
-	
-	/**
-	 * 
-	 */
-	@Override
-	public Message sendAndReceive(Node target, Message request) {
-		try {
-			return sendAndReceive(target, request, -1);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
+    // ç”¨äºè¯·æ±‚åº”ç­”åŒ¹é…çš„futureå®¹å™¨
+    Map<Long, FutureImpl<Message>> pendingQueue
+        = new ConcurrentHashMap<Long, FutureImpl<Message>>();
 
-	@Override
-	public Message sendAndReceive(Node target, Message request, long timeout) throws Exception {
-		Future<Message> future = send(target, request);
-		return future.get(timeout, TimeUnit.MILLISECONDS);
-	}
+    private Selector selector = null;
 
-	/**
-	 * IO¶àÂ·¸´ÓÃ´¦ÀíÏß³Ì
-	 */
-	@Override
-	public void run() {
-		while (true) {
-			try {
-				// ²»ÄÜÎŞÏŞµÈ´ı, ÒòÎª´æÔÚÃ»ÓĞ¿É¶ÁÊÂ¼şµ«ĞèÒª·¢ËÍÊı¾İµÄÇé¿ö
-				selector.select(100);
+    private void init() {
+        try {
+            // åˆå§‹åŒ–selectorå¯¹è±¡
+            selector = Selector.open();
 
-				Set<SelectionKey> selectionKeys = selector.selectedKeys();
-				Iterator<SelectionKey>iterator = selectionKeys.iterator();  
-	            while (iterator.hasNext()) {
-	            	SelectionKey selectionKey = iterator.next();
+            // å¯åŠ¨é€šä¿¡çº¿ç¨‹
+            Thread t = new Thread(this);
+            t.start();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-	            	if (selectionKey.isConnectable()) {
-	                	SocketChannel channel = (SocketChannel) selectionKey.channel();
-	                	ChannelWrapper channelWrapper = new ChannelWrapper(channel);
-	                	channelMap.put(channelWrapper.getPeer(), channelWrapper);
-	                	channel.register(selector, SelectionKey.OP_READ, channelWrapper);
-	            	} else if (selectionKey.isReadable()) {
-	            		ChannelWrapper serverChannel = (ChannelWrapper) selectionKey.attachment();
-	            		for (Message response = serverChannel.read();
-	            				response != null; response = serverChannel.read()) {
-		                    // »ñÈ¡ÏûÏ¢±êÊ¶
-		                    long msgId = response.getMessageId();
-		                    FutureImpl<Message> future = pendingQueue.get(msgId);       	
-		                    // ´ÓÎ´¾ö¶ÓÁĞÉ¾³ı
-		                    pendingQueue.remove(msgId);
-		                    // Í¨Öª
-		                    future.signal(response);		                    
-	            		}
-	                } else if (selectionKey.isWritable()) {
-	                	ChannelWrapper serverChannel = (ChannelWrapper) selectionKey.attachment();
-	                	serverChannel.write();
-	                	serverChannel.getChannel().register(selector, SelectionKey.OP_READ, serverChannel);
-	                }
-	            }
+    public boolean isConnected(Node node) {
+        return channelMap.containsKey(node);
+    }
 
-	            for (ChannelWrapper channelWrapper : channelMap.values()) {
-	            	if (channelWrapper.hasMessageToSend() == true) {
-	            		channelWrapper.getChannel().register(selector,
-	            				SelectionKey.OP_WRITE | SelectionKey.OP_READ, channelWrapper);
-	            	}
-	            }
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} 
-	}
+    public int open(Node node) {
+        try {
+            // æ‰“å¼€
+            SocketChannel channel = SocketChannel.open();
+            // è®¾ç½®éé˜»å¡
+            channel.configureBlocking(false);
+            channel.register(selector, SelectionKey.OP_CONNECT);
+            // è¿æ¥
+            channel.connect(node.getAddress());
+        } catch (ClosedChannelException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public Future<Message> send(Node target, Message request) {
+        FutureImpl<Message> future = new FutureImpl<Message>();
+        pendingQueue.put(request.getMessageId(), future);
+        channelMap.get(target).sendMessage(request);
+        return future;
+    }
+
+    /**
+     *
+     */
+    @Override
+    public Message sendAndReceive(Node target, Message request) {
+        try {
+            return sendAndReceive(target, request, -1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public Message sendAndReceive(Node target, Message request, long timeout) throws Exception {
+        Future<Message> future = send(target, request);
+        return future.get(timeout, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * IOå¤šè·¯å¤ç”¨å¤„ç†çº¿ç¨‹
+     */
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                // ä¸èƒ½æ— é™ç­‰å¾…, å› ä¸ºå­˜åœ¨æ²¡æœ‰å¯è¯»äº‹ä»¶ä½†éœ€è¦å‘é€æ•°æ®çš„æƒ…å†µ
+                selector.select(100);
+
+                Set<SelectionKey> selectionKeys = selector.selectedKeys();
+                Iterator<SelectionKey> iterator = selectionKeys.iterator();
+                while (iterator.hasNext()) {
+                    SelectionKey selectionKey = iterator.next();
+
+                    if (selectionKey.isConnectable()) {
+                        SocketChannel channel = (SocketChannel) selectionKey.channel();
+                        ChannelWrapper channelWrapper = new ChannelWrapper(channel);
+                        channelMap.put(channelWrapper.getPeer(), channelWrapper);
+                        channel.register(selector, SelectionKey.OP_READ, channelWrapper);
+                    } else if (selectionKey.isReadable()) {
+                        ChannelWrapper serverChannel = (ChannelWrapper) selectionKey.attachment();
+                        for (Message response = serverChannel.read();
+                            response != null; response = serverChannel.read()) {
+                            // è·å–æ¶ˆæ¯æ ‡è¯†
+                            long msgId = response.getMessageId();
+                            FutureImpl<Message> future = pendingQueue.get(msgId);
+                            // ä»æœªå†³é˜Ÿåˆ—åˆ é™¤
+                            pendingQueue.remove(msgId);
+                            // é€šçŸ¥
+                            future.signal(response);
+                        }
+                    } else if (selectionKey.isWritable()) {
+                        ChannelWrapper serverChannel = (ChannelWrapper) selectionKey.attachment();
+                        serverChannel.write();
+                        serverChannel.getChannel().register(selector, SelectionKey.OP_READ, serverChannel);
+                    }
+                }
+
+                for (ChannelWrapper channelWrapper : channelMap.values()) {
+                    if (channelWrapper.hasMessageToSend() == true) {
+                        channelWrapper.getChannel().register(selector,
+                            SelectionKey.OP_WRITE | SelectionKey.OP_READ, channelWrapper);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

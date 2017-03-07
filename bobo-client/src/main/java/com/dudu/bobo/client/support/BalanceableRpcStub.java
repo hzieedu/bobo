@@ -18,7 +18,7 @@ public class BalanceableRpcStub implements RpcStub {
 		List<Node> list = info.getServiceNodes();
 		for (Node node: list) {
 			RpcStubImpl stub = new RpcStubImpl(node);
-			// TODO: Èç¹û´ËÊ±³õÊ¼»¯Ê§°Ü, ÓÖµ±ÈçºÎ?
+			// TODO: å¦‚æœæ­¤æ—¶åˆå§‹åŒ–å¤±è´¥, åˆå½“å¦‚ä½•?
 			if (stub.init() == 0) {
 				policy.join(stub);
 			}
@@ -27,12 +27,12 @@ public class BalanceableRpcStub implements RpcStub {
 	
 	@Override
 	public RpcResponse call(RpcRequest request) throws Exception {
-		System.out.println("×Ô¶¯¸ºÔØ¿Í»§¶ËÉúĞ§!");
+		System.out.println("è‡ªåŠ¨è´Ÿè½½å®¢æˆ·ç«¯ç”Ÿæ•ˆ!");
 	
 		RpcStub stub = policy.select();
 		if (stub == null) {
-			System.out.println("Ã»ÓĞÌá¹©Õß?");
-			throw new Exception("Ã»ÓĞÌá¹©Õß");
+			System.out.println("æ²¡æœ‰æä¾›è€…?");
+			throw new Exception("æ²¡æœ‰æä¾›è€…");
 		}
 		RpcResponse response;
 		try {

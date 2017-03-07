@@ -7,6 +7,9 @@
   </parent>
   <groupId>com.dudu</groupId>
   <artifactId>bobo-client-demo</artifactId>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <dependencies>
   	<dependency>
   		<groupId>org.springframework</groupId>

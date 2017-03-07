@@ -17,107 +17,105 @@ import com.dudu.bobo.server.Executor;
 import com.dudu.bobo.server.ServingConnector;
 
 /**
- * 
+ *
  * @author liangy43
  *
  */
 public class ServingConnectorImpl implements ServingConnector, Runnable {
 
-	private static volatile ServingConnector instance = null;
+    private static volatile ServingConnector instance = null;
 
-	public static ServingConnector getServingConnector() {
-		/*
-		 * double check lock
-		 */
-		if (instance == null) {
-			synchronized(ServingConnectorImpl.class) {
-				ServingConnectorImpl server = new ServingConnectorImpl();
-				server.init();
-				instance = server;
-			}
-		}
+    public static ServingConnector getServingConnector() {
+        /*
+         * double check lock
+         */
+        if (instance == null) {
+            synchronized (ServingConnectorImpl.class) {
+                ServingConnectorImpl server = new ServingConnectorImpl();
+                server.init();
+                instance = server;
+            }
+        }
 
-		return instance;
-	}
+        return instance;
+    }
 
-	private Executor	executor;
-	private Selector	selector = null;
+    private Executor executor;
+    private Selector selector = null;
 
-	private Node		serverHost;
+    private Node serverHost;
 
-	Map<Node, ChannelWrapper> channelMap = new ConcurrentHashMap<Node, ChannelWrapper>();
-	
-	private void init() {
-		try {
-			// ³õÊ¼»¯·şÎñµØÖ·
+    Map<Node, ChannelWrapper> channelMap = new ConcurrentHashMap<Node, ChannelWrapper>();
 
-			ServerSocketChannel servingChannel = ServerSocketChannel.open();  
-			servingChannel.configureBlocking(false);
-			servingChannel.bind(serverHost.getAddress());
+    private void init() {
+        try {
+            // åˆå§‹åŒ–æœåŠ¡åœ°å€
 
-	        // Í¨¹ıopen()·½·¨ÕÒµ½Selector
-	        selector = Selector.open();  
-	        // ×¢²áµ½selector£¬µÈ´ıÁ¬½Ó  
-	        servingChannel.register(selector, SelectionKey.OP_ACCEPT);  
-	        
-			// Æô¶¯Í¨ĞÅÏß³Ì
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+            ServerSocketChannel servingChannel = ServerSocketChannel.open();
+            servingChannel.configureBlocking(false);
+            servingChannel.bind(serverHost.getAddress());
 
-	public void setExecutor(Executor executor) {
-		this.executor = executor;
-	}
-	
-	public void response(Node target, Message message) {
-		channelMap.get(target).sendMessage(message);
-	}
-	
-	public void run() {
-		while (true) {
-			try {
-				// ²»ÄÜÎŞÏŞµÈ´ı, ÒòÎª´æÔÚÃ»ÓĞ¿É¶ÁÊÂ¼şµ«ĞèÒª·¢ËÍÊı¾İµÄÇé¿ö
-				selector.select(100);
-				
-				Set<SelectionKey> selectionKeys = selector.selectedKeys();
-				Iterator<SelectionKey>iterator = selectionKeys.iterator();  
-	            while (iterator.hasNext()) {
-	            	SelectionKey selectionKey = iterator.next();
+            // é€šè¿‡open()æ–¹æ³•æ‰¾åˆ°Selector
+            selector = Selector.open();
+            // æ³¨å†Œåˆ°selectorï¼Œç­‰å¾…è¿æ¥  
+            servingChannel.register(selector, SelectionKey.OP_ACCEPT);
 
-	            	if (selectionKey.isAcceptable()) {
-	            		ServerSocketChannel  server = (ServerSocketChannel) selectionKey.channel();
-	            		SocketChannel client = server.accept();
-	            		client.configureBlocking(false);
-	            		
-	            		ChannelWrapper clientChannel = new ChannelWrapper(client);
-	            		channelMap.put(clientChannel.getPeer(), clientChannel);
-	            		
-	            		client.register(selector, SelectionKey.OP_READ, clientChannel);
-	            	} else if (selectionKey.isReadable()) {
-	            		ChannelWrapper clientChannel = (ChannelWrapper) selectionKey.attachment();
-	                    for (Message message = clientChannel.read();
-	                    		message != null; message = clientChannel.read()) {
-	                    	executor.dispatch(message, clientChannel.getPeer());
-	                    }
-	                } else if (selectionKey.isWritable()) {
-	                	ChannelWrapper clientChannel = (ChannelWrapper)selectionKey.attachment();
-	                	clientChannel.write();
-	                	clientChannel.getChannel().register(selector, SelectionKey.OP_READ, clientChannel);
-	                }
-	            }
+            // å¯åŠ¨é€šä¿¡çº¿ç¨‹
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	            for (ChannelWrapper channelWrapper : channelMap.values()) {
-	            	if (channelWrapper.hasMessageToSend() == true) {
-	            		channelWrapper.getChannel().register(selector,
-	            				SelectionKey.OP_WRITE | SelectionKey.OP_READ, channelWrapper);
-	            	}
-	            }
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} 	
-	}
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
+    }
+
+    public void response(Node target, Message message) {
+        channelMap.get(target).sendMessage(message);
+    }
+
+    public void run() {
+        while (true) {
+            try {
+                // ä¸èƒ½æ— é™ç­‰å¾…, å› ä¸ºå­˜åœ¨æ²¡æœ‰å¯è¯»äº‹ä»¶ä½†éœ€è¦å‘é€æ•°æ®çš„æƒ…å†µ
+                selector.select(100);
+
+                Set<SelectionKey> selectionKeys = selector.selectedKeys();
+                Iterator<SelectionKey> iterator = selectionKeys.iterator();
+                while (iterator.hasNext()) {
+                    SelectionKey selectionKey = iterator.next();
+
+                    if (selectionKey.isAcceptable()) {
+                        ServerSocketChannel server = (ServerSocketChannel) selectionKey.channel();
+                        SocketChannel client = server.accept();
+                        client.configureBlocking(false);
+
+                        ChannelWrapper clientChannel = new ChannelWrapper(client);
+                        channelMap.put(clientChannel.getPeer(), clientChannel);
+
+                        client.register(selector, SelectionKey.OP_READ, clientChannel);
+                    } else if (selectionKey.isReadable()) {
+                        ChannelWrapper clientChannel = (ChannelWrapper) selectionKey.attachment();
+                        for (Message message = clientChannel.read();
+                            message != null; message = clientChannel.read()) {
+                            executor.dispatch(message, clientChannel.getPeer());
+                        }
+                    } else if (selectionKey.isWritable()) {
+                        ChannelWrapper clientChannel = (ChannelWrapper) selectionKey.attachment();
+                        clientChannel.write();
+                        clientChannel.getChannel().register(selector, SelectionKey.OP_READ, clientChannel);
+                    }
+                }
+
+                for (ChannelWrapper channelWrapper : channelMap.values()) {
+                    if (channelWrapper.hasMessageToSend() == true) {
+                        channelWrapper.getChannel().register(selector,
+                            SelectionKey.OP_WRITE | SelectionKey.OP_READ, channelWrapper);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

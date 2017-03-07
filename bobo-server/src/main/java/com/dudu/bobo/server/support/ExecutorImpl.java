@@ -14,7 +14,7 @@ import com.dudu.bobo.server.RpcSkeleton;
 import com.dudu.bobo.server.ServingConnector;
 
 /**
- * ´¦ÀíÏß³Ì³Ø
+ * å¤„ç†çº¿ç¨‹æ± 
  * 
  * @author liangy43
  *

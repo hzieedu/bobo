@@ -19,19 +19,19 @@ public class Framework {
 			return;
 		}
 	
-		// 添加skeleton
+		// 娣诲姞skeleton
 		RpcSkeleton rpcSkeleton = new RpcSkeletonImpl(service, clazz);
 		
-		// 发布
+		// 鍙戝竷
 	}
 	
 	/**
 	 * 
 	 */
 	public void main() {
-		// 通信模块
+		// 閫氫俊妯″潡
 		
-		// 处理模块
+		// 澶勭悊妯″潡
 		
 		//
 	}

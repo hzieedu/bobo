@@ -1,3 +1,9 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package com.dudu.bobo.common;
 
 import java.io.ByteArrayOutputStream;
@@ -10,74 +16,76 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * 
+ *
  * @author liangy43
  *
  */
 public class ChannelWrapper {
-	SocketChannel	channel;
-	StreamReader 	reader;
-	Queue<Message>	sendQueue = new LinkedList<Message>();
-	Node			peer;
-	private final int	writeBufferSize	= 65536;
-	ByteBuffer		writeBuffer = ByteBuffer.allocate(writeBufferSize);
 
-	public ChannelWrapper(SocketChannel channel) throws IOException {
-		this.channel = channel;
-		reader = new StreamReader(channel);
-		peer = new NodeImpl((InetSocketAddress)channel.getRemoteAddress());
-		writeBuffer = ByteBuffer.allocate(65536);
-	}
-	
-	public ChannelWrapper(SocketChannel channel, ByteBuffer writeBuffer) throws IOException {
-		this.channel = channel;
-		reader = new StreamReader(channel);
-		peer = new NodeImpl((InetSocketAddress)channel.getRemoteAddress());
-		this.writeBuffer = writeBuffer;
-	}
+    SocketChannel channel;
+    StreamReader reader;
+    Queue<Message> sendQueue = new LinkedList<Message>();
+    Node peer;
+    private final int writeBufferSize = 65536;
+    ByteBuffer writeBuffer = ByteBuffer.allocate(writeBufferSize);
 
-	public Message read() {
-		return reader.read();
-	}
+    public ChannelWrapper(SocketChannel channel) throws IOException {
+        this.channel = channel;
+        reader = new StreamReader(channel);
+        peer = new NodeImpl((InetSocketAddress) channel.getRemoteAddress());
+        writeBuffer = ByteBuffer.allocate(65536);
+    }
 
-	public Node getPeer() {
-		return this.peer;
-	}
+    public ChannelWrapper(SocketChannel channel, ByteBuffer writeBuffer) throws IOException {
+        this.channel = channel;
+        reader = new StreamReader(channel);
+        peer = new NodeImpl((InetSocketAddress) channel.getRemoteAddress());
+        this.writeBuffer = writeBuffer;
+    }
 
-	public void sendMessage(Message message) {
-		this.sendQueue.add(message);
-	}
-	
-	public Message getSendMessage() {
-		return this.sendQueue.poll();
-	}
+    public Message read() {
+        return reader.read();
+    }
 
-	public boolean hasMessageToSend() {
-		return this.sendQueue.peek() != null;
-	}
-	
-	public SocketChannel getChannel() {
-		return this.channel;
-	}
-	
-	public void write() {
-		try {
-			writeBuffer.clear();
-			// ∑¢ÀÕ∂”¡–¿Ôµƒœ˚œ¢“ª¥Œ∑¢ÀÕ
-			for (Message message = sendQueue.poll(); message != null; ) {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				ObjectOutputStream oos = new ObjectOutputStream(baos);
-				oos.writeObject(message);
-				byte[] bytes = baos.toByteArray();
-				writeBuffer.putInt(bytes.length);
-				writeBuffer.put(bytes);
+    public Node getPeer() {
+        return this.peer;
+    }
 
-				message = sendQueue.poll();
-			}
-			writeBuffer.flip();
-			channel.write(writeBuffer);
-		} catch (IOException ioex) {
-			ioex.printStackTrace();
-		}
-	}
+    public void sendMessage(Message message) {
+        this.sendQueue.add(message);
+    }
+
+    public Message getSendMessage() {
+        return this.sendQueue.poll();
+    }
+
+    public boolean hasMessageToSend() {
+        return this.sendQueue.peek() != null;
+    }
+
+    public SocketChannel getChannel() {
+        return this.channel;
+    }
+
+    public void write() {
+        try {
+            writeBuffer.clear();
+            // ‰∏ÄÊ¨°ÊÄßÂèëÈÄÅ
+            for (Message message = sendQueue.poll(); message != null;) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(message);
+                byte[] bytes = baos.toByteArray();
+                writeBuffer.putInt(bytes.length);
+                writeBuffer.put(bytes);
+
+                message = sendQueue.poll();
+            }
+            writeBuffer.flip();
+            channel.write(writeBuffer);
+        } catch (IOException ioex) {
+            ioex.printStackTrace();
+        }
+    }
 }
+

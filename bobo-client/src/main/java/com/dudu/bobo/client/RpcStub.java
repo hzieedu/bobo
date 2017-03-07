@@ -4,7 +4,7 @@ import com.dudu.bobo.common.RpcRequest;
 import com.dudu.bobo.common.RpcResponse;
 
 /**
- * Ô¶¶Ë¹ý³Ì´æ¸ù
+ * è¿œç«¯è¿‡ç¨‹å­˜æ ¹
  * 
  * @author liangy43
  *

@@ -7,65 +7,65 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 /**
- * 
+ *
  * @author liangy43
  *
  */
 public class StreamReader {
-	private final SocketChannel	channel;
 
-	private final int	readBufferSize	= 65536;
-	private ByteBuffer	readBuffer		= ByteBuffer.allocate(readBufferSize);
-	private boolean 	corrupted		= false;
-	private int     	msgLen			= 0;
-	
-	public StreamReader(SocketChannel channel) {
-		this.channel = channel;
-	}
-	
-	public Message read() {
-		try {
-			int count = channel.read(readBuffer);
-	        if (count > 0) {
-	        	int len = 0;
-	        	// È·¶¨ÏûÏ¢³¤¶È
-	        	if (corrupted == false) {
-	        		// ²»×ã4×Ö½Ú?
-	            	if (readBuffer.limit() - readBuffer.position() < 4) {
-	            		return null;
-	            	}
-	            	// ¶ÁÈ¡ÏûÏ¢³¤¶È
-	            	len = readBuffer.getInt();	
-	        	} else {
-	        		len = msgLen;
-	        	}
-	        	
-	        	// Èç¹û¶ÁÈëµÄÏûÏ¢²»ÍêÕû, Ôò½áÊø¸ÃÁ¬½ÓµÄ±¾´Î¶ÁÈ¡, ´ıÏÂ´Î¶ÁÈ¡
-	        	if (readBuffer.remaining() < len) {
-	        		msgLen = len;
-	        		corrupted = true;
-	        		return null;
-	        	} else {
-	        		msgLen = 0;
-	        		corrupted = false;
-	        	}
-	        	
-	        	// ¶ÁÈ¡ÏûÏ¢
-	        	byte[] bytes = new byte[len];
-	        	readBuffer.get(bytes);
+    private final SocketChannel channel;
 
-	            // ·´ĞòÁĞÎª¶ÔÏó
-	        	ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-	            ObjectInputStream ois = new ObjectInputStream(bais);
-	            Message message = (Message) ois.readObject();
-				return message;
-	        }
-		} catch (IOException ioex) {
+    private final int readBufferSize = 65536;
+    private final ByteBuffer readBuffer = ByteBuffer.allocate(readBufferSize);
+    private boolean corrupted = false;
+    private int msgLen = 0;
 
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    public StreamReader(SocketChannel channel) {
+        this.channel = channel;
+    }
+
+    public Message read() {
+        try {
+            int count = channel.read(readBuffer);
+            if (count > 0) {
+                int len = 0;
+                // ç¡®å®šæ¶ˆæ¯é•¿åº¦
+                if (corrupted == false) {
+                    // ä¸è¶³4å­—èŠ‚?
+                    if (readBuffer.limit() - readBuffer.position() < 4) {
+                        return null;
+                    }
+                    // è¯»å–æ¶ˆæ¯é•¿åº¦
+                    len = readBuffer.getInt();
+                } else {
+                    len = msgLen;
+                }
+
+                // å¦‚æœè¯»å…¥çš„æ¶ˆæ¯ä¸å®Œæ•´, åˆ™ç»“æŸè¯¥è¿æ¥çš„æœ¬æ¬¡è¯»å–, å¾…ä¸‹æ¬¡è¯»å–
+                if (readBuffer.remaining() < len) {
+                    msgLen = len;
+                    corrupted = true;
+                    return null;
+                } else {
+                    msgLen = 0;
+                    corrupted = false;
+                }
+
+                // è¯»å–æ¶ˆæ¯
+                byte[] bytes = new byte[len];
+                readBuffer.get(bytes);
+
+                // ååºåˆ—ä¸ºå¯¹è±¡
+                ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+                ObjectInputStream ois = new ObjectInputStream(bais);
+                Message message = (Message) ois.readObject();
+                return message;
+            }
+        } catch (IOException ioex) {
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         return null;
-	}
+    }
 }

@@ -3,10 +3,6 @@ package com.dudu.bobo.server.support;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
 import com.dudu.bobo.server.RpcSkeleton;
 
 /**
@@ -25,7 +21,7 @@ public class RpcSkeletonContainer {
 		if (instance == null) {
 			synchronized(RpcSkeletonContainer.class) {
 				RpcSkeletonContainer container = new RpcSkeletonContainer();
-				// TODO ≥ı ºªØ
+				// TODO ÂàùÂßãÂåñ
 				instance = container;
 			}
 		}
