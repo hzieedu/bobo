@@ -7,55 +7,55 @@ import java.util.Arrays;
 
 import com.dudu.bobo.client.ProxyFactory;
 import com.dudu.bobo.client.RpcStub;
+import com.dudu.bobo.common.Node;
 import com.dudu.bobo.common.RpcRequest;
 import com.dudu.bobo.common.RpcResponse;
 
-public class ProxyFactoryImpl<T> implements ProxyFactory<T> {
-
-    private RpcStubContainer stubHandler = RpcStubContainer.getStubHandler();
+public class ProxyFactoryImpl implements ProxyFactory {
 
     @Override
     @SuppressWarnings("unchecked")
-    public T refer(Class<T> interfaceClass) throws Exception {
+    public <T> T refer(Class<T> interfaceClass) throws Exception {
         System.out.println("creating remote service stub" + interfaceClass.getName());
         return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
             new Class<?>[]{interfaceClass},
-            new RpcHandler(interfaceClass));
+            new RpcHandleWrapper(interfaceClass));
     }
 
-    class RpcHandler implements InvocationHandler {
+    @SuppressWarnings("unchecked")
+    public <T> T referBypass(Class<T> interfaceClass, Node server) throws Exception {
+        System.out.println("creating remote service stub" + interfaceClass.getName());
+        return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
+            new Class<?>[]{interfaceClass},
+            new RpcHandleWrapper(interfaceClass, server));
+    }
 
+    class RpcHandleWrapper implements InvocationHandler {
         private RpcStub stub;
 
+        public RpcHandleWrapper(Class<?> interfaceClass) {
+            stub = RpcStubContainer.getRpcStubContainer().getRpcStub(interfaceClass);
+        }
+
+        public RpcHandleWrapper(Class<?> interfaceClass, Node server) {
+            stub = RpcStubContainer.getRpcStubContainer().getRpcStubBypass(interfaceClass, server);
+        }
+        
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
             try {
                 if (stub == null) {
                     throw new NoSuchServiceException();
                 }
 
-                // 
                 RpcRequest request = new RpcRequest(method, args);
-
-                // 
                 RpcResponse response = stub.call(request);
-
-                // 
                 Object result = response.getResult();
-
-                System.out.println("Call remote procedure: " + method + ", " + Arrays.asList(args) + ", result: " + result);
 
                 return result;
             } catch (NoSuchServiceException ex) {
-                throw ex.getCause();
+                throw ex;
             }
         }
-
-        public RpcHandler(Class<?> interfaceClass) {
-            // 
-            stub = stubHandler.getRpcStub(interfaceClass);
-        }
-
     }
 }

@@ -68,4 +68,9 @@ public class Message implements Serializable {
     public void setAttachment(Object attachment) {
         this.attachment = attachment;
     }
+    
+    @Override
+    public String toString() {
+    	return String.format("Id: %s", messageId, messageBody.toString());
+    }
 }

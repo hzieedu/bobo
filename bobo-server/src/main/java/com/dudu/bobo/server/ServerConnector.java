@@ -8,10 +8,11 @@ import com.dudu.bobo.common.Message;
  * @author liangy43
  *
  */
-public interface ServingConnector {
-
+public interface ServerConnector { 
 	/**
 	 * 
+     * @param target
+     * @param message
 	 */
 	void response(Node target, Message message);
 }

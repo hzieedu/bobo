@@ -5,14 +5,14 @@ import com.dudu.bobo.common.RpcResponse;
 
 /**
  * 远端过程存根
- * 
+ *
  * @author liangy43
  *
  */
 public interface RpcStub {
 
-	/**
-	 * 
-	 */
-	RpcResponse call(RpcRequest request) throws Exception;
+    /**
+     *
+     */
+    RpcResponse call(RpcRequest request) throws Exception;
 }

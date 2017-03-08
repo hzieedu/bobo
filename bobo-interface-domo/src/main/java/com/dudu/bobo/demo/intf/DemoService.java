@@ -1,4 +1,4 @@
-package com.dudu.boboclientdemo;
+package com.dudu.bobo.demo.intf;
 
 /**
  * 

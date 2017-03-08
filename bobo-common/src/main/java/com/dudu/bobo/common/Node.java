@@ -7,7 +7,7 @@ import java.net.InetSocketAddress;
  * @author liangy43
  *
  */
-public interface Node {
+public interface Node extends Cloneable {
 
     /**
      *

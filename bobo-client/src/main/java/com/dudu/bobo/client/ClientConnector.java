@@ -6,7 +6,7 @@ import com.dudu.bobo.common.Message;
 import com.dudu.bobo.common.Node;
 
 /**
- * 
+ *
  * @author liangy43
  *
  */
@@ -15,20 +15,27 @@ public interface ClientConnector {
 	/**
 	 * 
 	 * @param target
-	 * @param request
 	 * @return
 	 */
-	Future<?> send(Node target, Message request);
-
-	/**
-	 * 
-	 * @return
-	 */
-	Message sendAndReceive(Node target, Message request) throws Exception;
+	int connect(Node target);
 	
-	/**
-	 * 
-	 * @return
-	 */
-	Message sendAndReceive(Node target, Message request, long timeout) throws Exception;	
+    /**
+     *
+     * @param target
+     * @param request
+     * @return
+     */
+    Future<?> send(Node target, Message request);
+
+    /**
+     *
+     * @return
+     */
+    Message sendAndReceive(Node target, Message request) throws Exception;
+
+    /**
+     *
+     * @return
+     */
+    Message sendAndReceive(Node target, Message request, long timeout) throws Exception;
 }

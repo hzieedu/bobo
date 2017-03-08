@@ -61,4 +61,9 @@ public class RpcRequest implements Serializable {
     public void setArguments(Object[] arguments) {
         this.arguments = arguments == null ? new Object[0] : arguments;
     }
+    
+    @Override
+    public String toString() {
+    	return String.format("%s()", methodName, arguments);
+    }
 }

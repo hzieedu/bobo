@@ -8,4 +8,9 @@ package com.dudu.bobo.server;
  */
 public interface ServiceRegister {
 
+    /**
+     * 
+     * @param clazz 
+     */
+    void publishService(Class<?> clazz);
 }

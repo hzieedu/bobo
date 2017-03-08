@@ -7,27 +7,27 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * 
+ *
  * @author liangy43
  *
  */
 public class ReferenceBeanDefinitionParser implements BeanDefinitionParser {
 
-	private final Class<?> beanClass;
-	
-	public ReferenceBeanDefinitionParser(Class<?> beanClass) {
-		this.beanClass = beanClass;
-	}
-	
-	@Override
-	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		//
-		RootBeanDefinition beanDefinition = new RootBeanDefinition();
-		
-		//
+    private final Class<?> beanClass;
+
+    public ReferenceBeanDefinitionParser(Class<?> beanClass) {
+        this.beanClass = beanClass;
+    }
+
+    @Override
+    public BeanDefinition parse(Element element, ParserContext parserContext) {
+        //
+        RootBeanDefinition beanDefinition = new RootBeanDefinition();
+
+        //
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
-        
+
         //
         String id = element.getAttribute("id");
         beanDefinition.getPropertyValues().addPropertyValue("id", id);
@@ -35,6 +35,6 @@ public class ReferenceBeanDefinitionParser implements BeanDefinitionParser {
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
 
         return beanDefinition;
-	}
+    }
 
 }

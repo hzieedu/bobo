@@ -6,24 +6,28 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+/**
+ * 
+ * @author liangy43
+ */
 public class ServiceBeanDefinitionParser implements BeanDefinitionParser {
 
-	private final Class<?> beanClass;
+    private final Class<?> beanClass;
 
-	public ServiceBeanDefinitionParser(Class<?> beanClass) {
-		this.beanClass = beanClass;
-	}
+    public ServiceBeanDefinitionParser(Class<?> beanClass) {
+        this.beanClass = beanClass;
+    }
 
-	@Override
-	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		//
-		RootBeanDefinition beanDefinition = new RootBeanDefinition();
-		
-		beanDefinition.setBeanClass(beanClass);
+    @Override
+    public BeanDefinition parse(Element element, ParserContext parserContext) {
+        //
+        RootBeanDefinition beanDefinition = new RootBeanDefinition();
 
-		beanDefinition.getPropertyValues().addPropertyValue("interfaceName", element.getAttribute("interface"));
+        beanDefinition.setBeanClass(beanClass);
 
-		return beanDefinition;
-	}
+        beanDefinition.getPropertyValues().addPropertyValue("interfaceName", element.getAttribute("interface"));
+
+        return beanDefinition;
+    }
 
 }

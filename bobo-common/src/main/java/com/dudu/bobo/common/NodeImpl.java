@@ -15,6 +15,10 @@ public class NodeImpl implements Node {
         this.addr = addr;
     }
 
+    public NodeImpl(String hostname, int port) {
+        this.addr = new InetSocketAddress(hostname, port);
+    }
+
     @Override
     public InetSocketAddress getAddress() {
         return this.addr;
@@ -33,5 +37,17 @@ public class NodeImpl implements Node {
     @Override
     public String toString() {
         return addr.toString();
+    }
+    
+    /**
+     * 地址需要深复制
+     * @return
+     * @throws CloneNotSupportedException 
+     */
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        NodeImpl clone = (NodeImpl) super.clone();
+        clone.addr = new InetSocketAddress(this.addr.getAddress(), this.addr.getPort());
+        return clone;
     }
 }

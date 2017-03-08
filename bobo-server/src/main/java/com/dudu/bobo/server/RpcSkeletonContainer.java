@@ -1,4 +1,4 @@
-package com.dudu.bobo.server.support;
+package com.dudu.bobo.server;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,17 +29,25 @@ public class RpcSkeletonContainer {
 		return instance;
 	}
 
-	Map<String, RpcSkeleton>	skeletonMap = new ConcurrentHashMap<String, RpcSkeleton>();
+	private final Map<String, RpcSkeleton>	skeletonMap = new ConcurrentHashMap<String, RpcSkeleton>();
 
+    private RpcSkeletonContainer() {
+        
+    }
+    
 	/**
 	 *
+     * @param rpcSkeleton
 	 */
 	public void registerRpcSkeleton(RpcSkeleton rpcSkeleton) {
-		skeletonMap.put(rpcSkeleton.getClass().getName(), rpcSkeleton);
+        System.out.println("register service interface" + rpcSkeleton.getInterfaceClass().getName());
+		skeletonMap.put(rpcSkeleton.getInterfaceClass().getName(), rpcSkeleton);
 	}
 
 	/**
 	 * 
+     * @param className
+     * @return 
 	 */
 	public RpcSkeleton getRpcSkeleton(String className) {
 		return skeletonMap.get(className);

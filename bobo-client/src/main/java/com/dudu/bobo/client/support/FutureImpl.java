@@ -15,8 +15,10 @@ public class FutureImpl<T> implements Future<T> {
 	private volatile T obj = null;
 
 	public void signal(T obj) {
-		this.obj = obj;
-		this.notify();
+		synchronized (this) {
+			this.obj = obj;
+			this.notify();
+		}
 	}
 	
 	@Override
@@ -49,8 +51,11 @@ public class FutureImpl<T> implements Future<T> {
 
 	@Override
 	public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-		this.wait(timeout);
-		return obj;
+		synchronized (this) {
+			this.wait(timeout);
+            System.out.println("终于等到你: " + obj.getClass().getName());
+			return obj;
+		}
 	}
 
 }

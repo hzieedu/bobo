@@ -6,19 +6,19 @@ import com.dudu.bobo.common.ServiceInfo;
 
 /**
  * 服务发现
- * 
+ *
  * @author liangy43
  *
  */
 public interface ServiceDiscovery {
 
-	/**
-	 * 
-	 */
-	List<ServiceInfo>	query();
-	
-	/**
-	 * 
-	 */
-	void onServiceListener(ServiceEvent event);
+    /**
+     *
+     */
+    List<ServiceInfo> query();
+
+    /**
+     *
+     */
+    void onServiceListener(ServiceEvent event);
 }

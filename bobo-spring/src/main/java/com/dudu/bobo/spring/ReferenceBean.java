@@ -7,23 +7,23 @@ import com.dudu.bobo.client.ProxyFactory;
 import com.dudu.bobo.client.support.ProxyFactoryImpl;
 
 /**
- * 
+ *
  * @author liangy43
  *
  * @param <T>
  */
 public class ReferenceBean<T> implements FactoryBean, InitializingBean {
 
-	private String			id;
-	
-    private String			interfaceName;
-    
-    private Class<?>		interfaceClass;
+    private String id;
 
-	private ProxyFactory	proxyFactory = new ProxyFactoryImpl();
-	
-    private volatile T 		proxy;
-	
+    private String interfaceName;
+
+    private Class<?> interfaceClass;
+
+    private ProxyFactory proxyFactory = new ProxyFactoryImpl();
+
+    private volatile T proxy;
+
     public String getId() {
         return id;
     }
@@ -40,38 +40,38 @@ public class ReferenceBean<T> implements FactoryBean, InitializingBean {
         this.interfaceName = interfaceName;
     }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object getObject() throws Exception {
-		if (proxy != null) {
-			return proxy;
-		}
-	
-		if (interfaceClass == null) {
-			throw new Exception("no such interface");
-		}
+    @SuppressWarnings("unchecked")
+    @Override
+    public Object getObject() throws Exception {
+        if (proxy != null) {
+            return proxy;
+        }
 
-		proxy = (T) proxyFactory.refer(interfaceClass);
-		return proxy;
-	}
+        if (interfaceClass == null) {
+            throw new Exception("no such interface");
+        }
 
-	@Override
-	public Class<?> getObjectType() {
-		return null;
-	}
+        proxy = (T) proxyFactory.refer(interfaceClass);
+        return proxy;
+    }
 
-	@Override
-	public boolean isSingleton() {
-		return false;
-	}
+    @Override
+    public Class<?> getObjectType() {
+        return null;
+    }
 
-	void setProxyFactory(ProxyFactory proxyFactory) {
-		this.proxyFactory = proxyFactory;
-	}
+    @Override
+    public boolean isSingleton() {
+        return false;
+    }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		interfaceClass = Class.forName(interfaceName);
-		System.out.println(String.format("代理[%s]引用的接口[%s]找到了!", id, interfaceName));
-	}
+    void setProxyFactory(ProxyFactory proxyFactory) {
+        this.proxyFactory = proxyFactory;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        interfaceClass = Class.forName(interfaceName);
+        System.out.println(String.format("代理[%s]引用的接口[%s]找到了!", id, interfaceName));
+    }
 }

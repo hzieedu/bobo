@@ -1,1 +1,1 @@
-http\://www.dudu.com/schema/bobo=com.dudu.bobo.client.support.spring.BoboNamespaceHandler
+http\://www.dudu.com/schema/bobo=com.dudu.bobo.spring.BoboNamespaceHandler

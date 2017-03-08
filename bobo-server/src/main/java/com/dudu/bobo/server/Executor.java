@@ -1,9 +1,8 @@
 package com.dudu.bobo.server;
 
-import com.dudu.bobo.common.Node;
-
 import java.io.IOException;
 
+import com.dudu.bobo.common.Node;
 import com.dudu.bobo.common.Message;
 
 /**
@@ -11,13 +10,12 @@ import com.dudu.bobo.common.Message;
  * @author liangy43
  *
  */
-public interface Executor {
-
+public interface Executor extends Lifecycle {
 	/**
 	 * 
 	 * @param message
 	 * @param src
-	 * @throws Exception
+	 * @throws IOException
 	 */
 	void dispatch(Message message, Node src) throws IOException;
 }

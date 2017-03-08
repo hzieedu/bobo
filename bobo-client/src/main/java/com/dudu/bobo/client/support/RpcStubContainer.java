@@ -8,66 +8,75 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.dudu.bobo.client.RpcStub;
 import com.dudu.bobo.client.ServiceDiscovery;
 import com.dudu.bobo.client.ServiceEvent;
+import com.dudu.bobo.common.Node;
 import com.dudu.bobo.common.ServiceInfo;
 
 /**
- * 
+ *
  * @author liangy43
  *
  */
-public class RpcStubContainer implements ServiceDiscovery{
+public class RpcStubContainer implements ServiceDiscovery {
 
-	private static volatile RpcStubContainer instance = null;
+    private static volatile RpcStubContainer instance = null;
 
-	public static RpcStubContainer getStubHandler() {
-		/*
-		 * double check lock
-		 */
-		if (instance == null) {
-			synchronized(RpcStubContainer.class) {
-				RpcStubContainer container= new RpcStubContainer();
-				container.init();
-				instance = container;
-			}
-		}
+    private RpcStubContainer() {
+    	
+    }
 
-		return instance;
-	}
-	
-	public Map<String, RpcStub> map = new ConcurrentHashMap<String, RpcStub>();
+    public static RpcStubContainer getRpcStubContainer() {
+        /*
+         * double check lock
+         */
+        if (instance == null) {
+            synchronized (RpcStubContainer.class) {
+                RpcStubContainer container = new RpcStubContainer();
+                container.init();
+                instance = container;
+            }
+        }
 
-	public RpcStub getRpcStub(Class<?> clazz) {
-		return map.get(clazz.getName());
-	}
+        return instance;
+    }
 
-	public void init() {
-		List<ServiceInfo> serviceinfo = query();
-		for (ServiceInfo info : serviceinfo) {
-			BalanceableRpcStub stub = new BalanceableRpcStub();
-			stub.init(info);
-			map.put(info.getInterfaceName(), stub);
-		}
-	}
+    public Map<String, RpcStub> map = new ConcurrentHashMap<String, RpcStub>();
 
-	void run() {
-		while (true) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+    public RpcStub getRpcStub(Class<?> clazz) {
+        return map.get(clazz.getName());
+    }
 
-	@Override
-	public List<ServiceInfo> query() {
-		List<ServiceInfo> list = new ArrayList<ServiceInfo>();
-		return list;
-	}
+    public RpcStub getRpcStubBypass(Class<?> clazz, Node server) {
+    	RpcStub stub = new RpcStubImpl(server);
+    	return stub;
+    }
+    
+    public void init() {
+        List<ServiceInfo> serviceinfo = query();
+        for (ServiceInfo info : serviceinfo) {
+            BalanceableRpcStub stub = new BalanceableRpcStub();
+            stub.init(info);
+            map.put(info.getInterfaceName(), stub);
+        }
+    }
 
-	@Override
-	public void onServiceListener(ServiceEvent event) {
-		
-	}
+    void run() {
+        while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public List<ServiceInfo> query() {
+        List<ServiceInfo> list = new ArrayList<ServiceInfo>();
+        return list;
+    }
+
+    @Override
+    public void onServiceListener(ServiceEvent event) {
+
+    }
 }
