@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.dudu.bobo.common;
 
 import java.io.ByteArrayOutputStream;
@@ -21,21 +20,23 @@ import java.util.Queue;
  *
  */
 public class ChannelWrapper {
-	private volatile boolean		status = false;
-	public boolean connected() {
-		return this.status;
-	}
-	
-	public void connected(boolean status) {
-		this.status = status;
-	}
-	
-    private final Node              peer;       // 对端节点标识
-    private final SocketChannel     channel;
-    private final StreamReader      reader;
-    private final Queue<Message>    sendQueue = new LinkedList<Message>();      // 发送队列
-    private final int               writeBufferSize = 65536;
-    private final ByteBuffer        writeBuffer;
+
+    private volatile boolean status = false;
+
+    public boolean connected() {
+        return this.status;
+    }
+
+    public void connected(boolean status) {
+        this.status = status;
+    }
+
+    private final Node peer;       // 对端节点标识
+    private final SocketChannel channel;
+    private final StreamReader reader;
+    private final Queue<Message> sendQueue = new LinkedList<Message>();      // 发送队列
+    private final int writeBufferSize = 65536;
+    private final ByteBuffer writeBuffer;
 
     public ChannelWrapper(Node peer, SocketChannel channel) {
         this.channel = channel;
@@ -43,7 +44,7 @@ public class ChannelWrapper {
         this.reader = new StreamReader(channel);
         this.writeBuffer = ByteBuffer.allocate(writeBufferSize);
     }
-    
+
     public ChannelWrapper(SocketChannel channel) throws IOException {
         this.channel = channel;
         this.reader = new StreamReader(channel);
@@ -82,20 +83,6 @@ public class ChannelWrapper {
         return this.channel;
     }
 
-    private static String byte2hex(byte [] buffer){  
-    	StringBuffer h = new StringBuffer();  
-          
-        for(int i = 0; i < buffer.length; i++){  
-            String temp = Integer.toHexString(buffer[i] & 0xFF);  
-            if(temp.length() == 1){  
-                temp = "0" + temp;  
-            }  
-            h.append(" ").append(temp);
-        }  
-          
-        return h.toString();          
-    }
-    
     public void write() {
         try {
             writeBuffer.clear();
@@ -107,7 +94,7 @@ public class ChannelWrapper {
                 byte[] bytes = baos.toByteArray();
                 writeBuffer.putInt(bytes.length);   // 消息长度作为报文的先导码, 消息长度不包含记录该长度的4字节
                 writeBuffer.put(bytes);
-            	message = sendQueue.poll();
+                message = sendQueue.poll();
             }
             writeBuffer.flip();
             channel.write(writeBuffer);
@@ -116,4 +103,3 @@ public class ChannelWrapper {
         }
     }
 }
-

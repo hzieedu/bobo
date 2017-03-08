@@ -12,42 +12,23 @@ import java.nio.channels.SocketChannel;
  *
  */
 public class StreamReader {
-    private final SocketChannel     channel;
-    private final int               readBufferSize = 65536;
-    private final ByteBuffer        readBuffer = ByteBuffer.allocate(readBufferSize);
-    private boolean                 corrupted = false;
-    private int                     msgLen = 0;
+
+    private final SocketChannel channel;
+    private final int readBufferSize = 65536;
+    private final ByteBuffer readBuffer = ByteBuffer.allocate(readBufferSize);
+    private boolean corrupted = false;
+    private int msgLen = 0;
 
     public StreamReader(SocketChannel channel) {
         this.channel = channel;
     }
 
-        private static String byte2hex(byte [] buffer){  
-    	StringBuffer h = new StringBuffer();  
-          
-        for(int i = 0; i < buffer.length; i++){  
-            String temp = Integer.toHexString(buffer[i] & 0xFF);  
-            if(temp.length() == 1){  
-                temp = "0" + temp;  
-            }  
-            h.append(" ").append(temp);
-        }  
-          
-        return h.toString();          
-    }
-    
-    public static int byteArrayToInt(byte[] b) {  
-        return   b[3] & 0xFF |  
-                (b[2] & 0xFF) << 8 |  
-                (b[1] & 0xFF) << 16 |  
-                (b[0] & 0xFF) << 24;  
-    }    
-
     /**
-     * TODO: 在一次读事件处理中不能重复调用该方法, 因为多次调用后channel.read会返回0
-     * 这与TCP连接断开的情况相同, 从而无法判断这是否一个连接断开的事件
+     * TODO: 在一次读事件处理中不能重复调用该方法, 因为多次调用后channel.read会返回0 这与TCP连接断开的情况相同,
+     * 从而无法判断这是否一个连接断开的事件
+     *
      * @return
-     * @throws DisconnectException 
+     * @throws DisconnectException
      */
     public Message read() throws DisconnectException {
         try {
