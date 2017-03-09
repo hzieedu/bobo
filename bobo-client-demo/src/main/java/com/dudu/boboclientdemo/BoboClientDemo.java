@@ -15,19 +15,16 @@ public class BoboClientDemo {
         context.start();
 
         DemoService demoService = (DemoService) context.getBean("demoService");
-        try {
-            demoService.hello("liangy43");
-        } catch (Exception ex) {
-            System.out.println(ex);
-            //	ex.printStackTrace();
-        }
-
         DemoService demoService2 = (DemoService) context.getBean("demoService");
+        
         try {
-            demoService2.hello("yongyong");
-        } catch (Exception ex) {
-            System.out.println(ex);
-            //	ex.printStackTrace();
+            for (int i = 0; i < 5; i++) {
+        		System.out.println(demoService.hello("liangy43@chinaunicom.cn"));
+        		System.out.println(demoService2.hello("yongyong"));
+        		Thread.sleep(1000);
+            }
+        } catch (InterruptedException ie) {
+        
         }
     }
 }

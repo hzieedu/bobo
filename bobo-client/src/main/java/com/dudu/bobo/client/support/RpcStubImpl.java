@@ -18,7 +18,7 @@ public class RpcStubImpl implements RpcStub {
 	// 用于请求-应答匹配, 不能重复且存在竞争条件, 故而使用原子类型
 	private static AtomicLong reqId = new AtomicLong(0);
 
-	public RpcStubImpl(Node node) {
+	public RpcStubImpl(Node node) throws Exception{
 		this.target = node;
 		client.connect(target);
 	}

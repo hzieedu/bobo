@@ -1,16 +1,16 @@
 package com.dudu.boboserverdemo;
 
-import com.dudu.bobo.server.support.Framework;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+/**
+ * 
+ * @author liangy43
+ */
 public class BoboServerDemo {
 
 	public static void main(String[] args) throws Exception {
-		Framework framework = Framework.getFramework();
-		
-		framework.startServing();
-		
-        framework.export(new DemoServiceImpl(), com.dudu.bobo.demo.intf.DemoService.class);
-        
-		System.in.read();
+        ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext(new String[]{"applicationContext.xml"});
+        context.start();
 	}
 }

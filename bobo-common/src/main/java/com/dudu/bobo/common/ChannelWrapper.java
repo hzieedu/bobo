@@ -21,22 +21,16 @@ import java.util.Queue;
  */
 public class ChannelWrapper {
 
-    private volatile boolean status = false;
-
-    public boolean connected() {
-        return this.status;
-    }
-
-    public void connected(boolean status) {
-        this.status = status;
-    }
-
-    private final Node peer;       // 对端节点标识
-    private final SocketChannel channel;
-    private final StreamReader reader;
-    private final Queue<Message> sendQueue = new LinkedList<Message>();      // 发送队列
-    private final int writeBufferSize = 65536;
-    private final ByteBuffer writeBuffer;
+    public static final int         CONNECTING  = 0;
+    public static final int         CONNECTED   = 1;
+    
+    private volatile int            status = CONNECTING;
+    private final Node              peer;       // 对端节点标识
+    private final SocketChannel     channel;
+    private final StreamReader      reader;
+    private final Queue<Message>    sendQueue = new LinkedList<Message>();      // 发送队列
+    private final int               writeBufferSize = 65536;
+    private final ByteBuffer        writeBuffer;
 
     public ChannelWrapper(Node peer, SocketChannel channel) {
         this.channel = channel;
@@ -48,15 +42,23 @@ public class ChannelWrapper {
     public ChannelWrapper(SocketChannel channel) throws IOException {
         this.channel = channel;
         this.reader = new StreamReader(channel);
-        this.peer = new NodeImpl((InetSocketAddress) channel.getRemoteAddress());
+        this.peer = new InetNode((InetSocketAddress) channel.getRemoteAddress());
         this.writeBuffer = ByteBuffer.allocate(writeBufferSize);
     }
 
     public ChannelWrapper(SocketChannel channel, ByteBuffer writeBuffer) throws IOException {
         this.channel = channel;
         reader = new StreamReader(channel);
-        peer = new NodeImpl((InetSocketAddress) channel.getRemoteAddress());
+        peer = new InetNode((InetSocketAddress) channel.getRemoteAddress());
         this.writeBuffer = writeBuffer;
+    }
+
+    public int getConnected() {
+        return this.status;
+    }
+
+    public void setConnected(int status) {
+        this.status = status;
     }
 
     public Message read() throws DisconnectException {

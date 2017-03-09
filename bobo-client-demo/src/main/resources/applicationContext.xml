@@ -10,5 +10,6 @@
     http://www.dudu.com/schema/bobo
     http://www.dudu.com/schema/bobo/bobo.xsd">
 
-    <bobo:reference id="demoService" interface="com.dudu.boboclientdemo.DemoService" />
+    <bobo:client name="demo"/>
+    <bobo:reference id="demoService" interface="com.dudu.bobo.demo.intf.DemoService" bypass="10.37.241.81:28811" />
 </beans>

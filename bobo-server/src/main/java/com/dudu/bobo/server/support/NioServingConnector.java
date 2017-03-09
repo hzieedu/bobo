@@ -113,6 +113,7 @@ public class NioServingConnector implements ServerConnector, Runnable {
 
                             ChannelWrapper clientChannel = new ChannelWrapper(client);
                             channelMap.put(clientChannel.getPeer(), clientChannel);
+                            clientChannel.setConnected(ChannelWrapper.CONNECTED);
                             System.out.println(String.format("accept connection from [%s]", clientChannel.getPeer()));
                             client.register(selector, SelectionKey.OP_READ, clientChannel);
                         }

@@ -32,6 +32,13 @@ public class ReferenceBeanDefinitionParser implements BeanDefinitionParser {
         String id = element.getAttribute("id");
         beanDefinition.getPropertyValues().addPropertyValue("id", id);
         beanDefinition.getPropertyValues().addPropertyValue("interfaceName", element.getAttribute("interface"));
+        try {
+            int timeout = Integer.parseInt(element.getAttribute("timout"));
+            beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
+        } catch (NumberFormatException e) {
+            
+        }        
+        beanDefinition.getPropertyValues().addPropertyValue("bypass", element.getAttribute("bypass"));
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
 
         return beanDefinition;

@@ -7,15 +7,15 @@ import java.net.InetSocketAddress;
  * @author liangy43
  *
  */
-public class NodeImpl implements Node {
+public class InetNode implements Node {
 
     private InetSocketAddress addr;
 
-    public NodeImpl(InetSocketAddress addr) {
+    public InetNode(InetSocketAddress addr) {
         this.addr = addr;
     }
 
-    public NodeImpl(String hostname, int port) {
+    public InetNode(String hostname, int port) {
         this.addr = new InetSocketAddress(hostname, port);
     }
 
@@ -46,7 +46,7 @@ public class NodeImpl implements Node {
      */
     @Override
     public Object clone() throws CloneNotSupportedException {
-        NodeImpl clone = (NodeImpl) super.clone();
+        InetNode clone = (InetNode) super.clone();
         clone.addr = new InetSocketAddress(this.addr.getAddress(), this.addr.getPort());
         return clone;
     }

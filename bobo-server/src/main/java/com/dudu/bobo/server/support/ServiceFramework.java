@@ -5,7 +5,7 @@ import  java.io.InputStream;
 import  java.io.IOException;
 
 import com.dudu.bobo.common.Node;
-import com.dudu.bobo.common.NodeImpl;
+import com.dudu.bobo.common.InetNode;
 import com.dudu.bobo.server.RpcSkeletonContainer;
 import com.dudu.bobo.server.RpcSkeleton;
 import com.dudu.bobo.server.ServiceRegister;
@@ -15,20 +15,20 @@ import com.dudu.bobo.server.ServiceRegister;
  * @author liangy43
  *
  */
-public class Framework {
+public class ServiceFramework {
 
-    private static volatile Framework instance = null;
+    private static volatile ServiceFramework instance = null;
 
-    private Framework() {    
+    private ServiceFramework() {    
     }
 
-    public static Framework getFramework() {
+    public static ServiceFramework getServiceFramework() {
         /*
          * double check lock
          */
         if (instance == null) {
             synchronized (NioServingConnector.class) {
-                Framework server = new Framework();   
+                ServiceFramework server = new ServiceFramework();   
                 instance = server;
                 return instance;
             }
@@ -51,7 +51,7 @@ public class Framework {
         String hostName = "0.0.0.0";
         String port = "28800";
         try  {
-        	InputStream in = Framework.class.getResourceAsStream("/server.properties");
+        	InputStream in = ServiceFramework.class.getResourceAsStream("/server.properties");
         	if (in != null) {
 	            prop.load(in);
 	            hostName = prop.getProperty("ip").trim();
@@ -61,7 +61,7 @@ public class Framework {
             e.printStackTrace();
         } finally {
         	System.out.println(String.format("服务地址: [%s:%s]", hostName, port));
-            servingHost = new NodeImpl(hostName, Integer.parseInt(port));
+            servingHost = new InetNode(hostName, Integer.parseInt(port));
         }
     }
     /**

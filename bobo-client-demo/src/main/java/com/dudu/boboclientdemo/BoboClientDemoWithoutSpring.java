@@ -3,7 +3,7 @@ package com.dudu.boboclientdemo;
 import com.dudu.bobo.client.support.ProxyFactoryImpl;
 import com.dudu.bobo.client.support.RpcContext;
 import com.dudu.bobo.common.Node;
-import com.dudu.bobo.common.NodeImpl;
+import com.dudu.bobo.common.InetNode;
 import com.dudu.bobo.demo.intf.DemoService;
 
 /**
@@ -15,11 +15,11 @@ public class BoboClientDemoWithoutSpring {
 
 	public static void main(String[] args) {
         try {
-    		RpcContext context = RpcContext.getRpcContext();
-    		context.start();
+            RpcContext context = RpcContext.getRpcContext();
+            context.start();
     		
     		ProxyFactoryImpl factory = new ProxyFactoryImpl();
-    		Node server = new NodeImpl("10.37.241.81", 28811);
+    		Node server = new InetNode("10.37.241.81", 28811);
     		
     		Thread.sleep(1000);
     

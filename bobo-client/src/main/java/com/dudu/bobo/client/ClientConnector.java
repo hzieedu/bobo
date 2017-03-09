@@ -12,20 +12,20 @@ import com.dudu.bobo.common.Node;
  */
 public interface ClientConnector {
 
-	/**
-	 * 
-	 * @param target
-	 * @return
-	 */
-	int connect(Node target);
-	
+    /**
+     *
+     * @param target
+     * @return
+     */
+    int connect(Node target) throws Exception;
+
     /**
      *
      * @param target
      * @param request
      * @return
      */
-    Future<?> send(Node target, Message request);
+    Future<?> send(Node target, Message request) throws Exception;
 
     /**
      *

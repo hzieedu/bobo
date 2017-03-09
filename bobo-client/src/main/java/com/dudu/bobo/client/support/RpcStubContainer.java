@@ -46,8 +46,12 @@ public class RpcStubContainer implements ServiceDiscovery {
     }
 
     public RpcStub getRpcStubBypass(Class<?> clazz, Node server) {
-    	RpcStub stub = new RpcStubImpl(server);
-    	return stub;
+        try {
+            RpcStub stub = new RpcStubImpl(server);
+            return stub;
+        } catch (Exception e) {
+            return null;
+        }
     }
     
     public void init() {

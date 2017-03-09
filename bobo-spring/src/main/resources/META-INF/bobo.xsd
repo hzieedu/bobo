@@ -2,17 +2,31 @@
 <xsd:schema xmlns="http://www.dudu.com/schema/bobo"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.dudu.com/schema/bobo">
 
+    <xsd:element name="server">
+        <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string" />
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="service">
+		<xsd:complexType>
+			<xsd:attribute name="interface" type="xsd:string" />
+			<xsd:attribute name="implement" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+
+    <xsd:element name="client">
+        <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string" />
+        </xsd:complexType>
+    </xsd:element>
+    
 	<xsd:element name="reference">
 		<xsd:complexType>
 			<xsd:attribute name="id" type="xsd:string" />
 			<xsd:attribute name="interface" type="xsd:string" />
-		</xsd:complexType>
-	</xsd:element>
-
-	<xsd:element name="service">
-		<xsd:complexType>
-			<xsd:attribute name="interface" type="xsd:string" />
-			<xsd:attribute name="ref" type="xsd:string" />
+            <xsd:attribute name="timeout" type="xsd:int" />
+            <xsd:attribute name="bypass" type="xsd:string" />
 		</xsd:complexType>
 	</xsd:element>
 

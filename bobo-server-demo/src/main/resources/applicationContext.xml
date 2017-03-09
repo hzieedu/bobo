@@ -10,5 +10,7 @@
     http://www.dudu.com/schema/bobo
     http://www.dudu.com/schema/bobo/bobo.xsd">
 
-    <bobo:reference id="demoService" interface="com.dudu.boboclientdemo.DemoService" />
+    <bobo:server name="demoServer" />
+    <bobo:service implement="demoService" interface="com.dudu.bobo.demo.intf.DemoService" />
+    <bean id="demoService" class="com.dudu.boboserverdemo.DemoServiceImpl" />
 </beans>

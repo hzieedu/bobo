@@ -31,7 +31,7 @@ public class NioClientConnector implements ClientConnector, Runnable {
     private static volatile NioClientConnector instance = null;
 
     private NioClientConnector() {
-    	
+
     }
 
     public static NioClientConnector getNioClientConnector() {
@@ -48,7 +48,7 @@ public class NioClientConnector implements ClientConnector, Runnable {
         return instance;
     }
 
-    private Map<Node, ChannelWrapper> channelMap
+    private final Map<Node, ChannelWrapper> channelMap
         = new HashMap<Node, ChannelWrapper>();
 
     // 用于请求应答匹配的future容器
@@ -66,34 +66,36 @@ public class NioClientConnector implements ClientConnector, Runnable {
             Thread t = new Thread(this);
             t.start();
         } catch (IOException e) {
-            e.printStackTrace();
             throw e;
         }
     }
 
-    public int connect(Node node) {
+    public int connect(Node node) throws Exception {
         try {
-        	synchronized (channelMap) {
-            	if (channelMap.containsKey(node)) {
-            		return 0;
-            	}
-            	// 打开
+            synchronized (channelMap) {
+                if (channelMap.containsKey(node)) {
+                    return 0;
+                }
+                // 打开
                 SocketChannel channel = SocketChannel.open();
                 ChannelWrapper channelWrapper = new ChannelWrapper(node, channel);
                 channelMap.put(node, channelWrapper);
-                
+
                 // 设置非阻塞
                 channel.configureBlocking(false);
                 channel.register(selector, SelectionKey.OP_CONNECT, channelWrapper);
                 // 连接
                 channel.connect(node.getAddress());
-        	}
+            }
+            
+            return 0;
         } catch (ClosedChannelException e) {
             e.printStackTrace();
+            throw e;
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        return 0;
+            throw e;
+        }        
     }
 
     /**
@@ -101,15 +103,15 @@ public class NioClientConnector implements ClientConnector, Runnable {
      * @return
      */
     @Override
-    public Future<Message> send(Node target, Message request) {
+    public Future<Message> send(Node target, Message request) throws Exception {
         ChannelWrapper channel = channelMap.get(target);
         if (channel != null) {
             FutureImpl<Message> future = new FutureImpl<Message>();
             pendingQueue.put(request.getMessageId(), future);
-        	channel.sendMessage(request);
-	        return future;
+            channel.sendMessage(request);
+            return future;
         } else {
-        	return null;
+            return null;
         }
     }
 
@@ -117,12 +119,12 @@ public class NioClientConnector implements ClientConnector, Runnable {
      *
      */
     @Override
-    public Message sendAndReceive(Node target, Message request) {
+    public Message sendAndReceive(Node target, Message request) throws Exception {
         try {
             return sendAndReceive(target, request, Long.MAX_VALUE);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            throw e;
         }
     }
 
@@ -130,9 +132,9 @@ public class NioClientConnector implements ClientConnector, Runnable {
     public Message sendAndReceive(Node target, Message request, long timeout) throws Exception {
         Future<Message> future = send(target, request);
         if (future != null) {
-        	return future.get(timeout, TimeUnit.MILLISECONDS);
+            return future.get(timeout, TimeUnit.MILLISECONDS);
         } else {
-        	return null;
+            return null;
         }
     }
 
@@ -151,18 +153,18 @@ public class NioClientConnector implements ClientConnector, Runnable {
                 while (iterator.hasNext()) {
                     SelectionKey selectionKey = iterator.next();
                     iterator.remove();
-                    
+
                     if (selectionKey.isConnectable()) {
                         SocketChannel channel = (SocketChannel) selectionKey.channel();
                         ChannelWrapper serverChannel = (ChannelWrapper) selectionKey.attachment();
                         System.out.println(String.format("server[%s] connected", channel.getRemoteAddress()));
-                        serverChannel.connected(true);
+                        serverChannel.setConnected(ChannelWrapper.CONNECTED);
                         channel.finishConnect();
                         channel.register(selector, SelectionKey.OP_READ, serverChannel);
                     } else if (selectionKey.isReadable()) {
                         ChannelWrapper serverChannel = (ChannelWrapper) selectionKey.attachment();
                         try {
-	                        Message response = serverChannel.read();
+                            Message response = serverChannel.read();
                             // 获取消息标识
                             long msgId = response.getMessageId();
                             FutureImpl<Message> future = pendingQueue.get(msgId);
@@ -170,13 +172,13 @@ public class NioClientConnector implements ClientConnector, Runnable {
                             pendingQueue.remove(msgId);
                             // 通知
                             future.signal(response);
-	                    } catch (DisconnectException de) {
-	                        System.out.println(String.format("server [%s] close the connection", serverChannel.getPeer()));
-	                        synchronized (channelMap) {
-	                        	serverChannel.getChannel().close();
-	                        	channelMap.remove(serverChannel.getPeer());
-	                        }
-	                    }
+                        } catch (DisconnectException de) {
+                            System.out.println(String.format("server [%s] close the connection", serverChannel.getPeer()));
+                            synchronized (channelMap) {
+                                serverChannel.getChannel().close();
+                                channelMap.remove(serverChannel.getPeer());
+                            }
+                        }
                     } else if (selectionKey.isWritable()) {
                         ChannelWrapper serverChannel = (ChannelWrapper) selectionKey.attachment();
                         serverChannel.write();
@@ -185,16 +187,14 @@ public class NioClientConnector implements ClientConnector, Runnable {
                 }
 
                 synchronized (channelMap) {
-	                for (ChannelWrapper channelWrapper : channelMap.values()) {
-	              //  	System.out.println(String.format("队列[%s], 空[%b], 连接[%b]", 
-	              //  				channelWrapper.getPeer(), channelWrapper.hasMessageToSend(), channelWrapper.connected()));
-	                	// 连接建立后才关注写事件, 否则会写失败
-	                    if (channelWrapper.hasMessageToSend() == true
-	                    		&& channelWrapper.connected() == true) {
-	                        channelWrapper.getChannel().register(selector,
-	                            SelectionKey.OP_WRITE | SelectionKey.OP_READ, channelWrapper);
-	                    }
-	                }
+                    for (ChannelWrapper channelWrapper : channelMap.values()) {
+                        // 连接建立后才关注写事件, 否则会写失败
+                        if (channelWrapper.hasMessageToSend() == true
+                            && channelWrapper.getConnected() == ChannelWrapper.CONNECTED) {
+                            channelWrapper.getChannel().register(selector,
+                                SelectionKey.OP_WRITE | SelectionKey.OP_READ, channelWrapper);
+                        }
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

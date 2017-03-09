@@ -2,6 +2,8 @@ package com.dudu.bobo.client.support;
 
 import java.io.IOException;
 
+import com.dudu.bobo.client.ProxyFactory;
+
 /**
  * 
  * @author liangy43
@@ -38,4 +40,8 @@ public class RpcContext {
 			e.printStackTrace();
 		}
 	}
+    
+    public ProxyFactory getProxyFactory() {
+        return new ProxyFactoryImpl();
+    }
 }
