@@ -8,7 +8,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.dudu.bobo.client.support.RpcContext;
+import com.dudu.bobo.client.support.BoboClient;
 import com.dudu.bobo.client.ProxyFactory;
 import com.dudu.bobo.common.InetNode;
 
@@ -107,10 +107,10 @@ public class ReferenceBean<T> implements FactoryBean, InitializingBean, Applicat
         interfaceClass = Class.forName(interfaceName);
         System.out.println(String.format("代理[%s]引用的接口[%s]找到了!", id, interfaceName));
         
-        Map map = applicationContext.getBeansOfType(RpcContext.class);
+        Map map = applicationContext.getBeansOfType(BoboClient.class);
         if (map.values().isEmpty() == false) {
-            RpcContext rpcContext = (RpcContext)map.values().iterator().next();
-            proxyFactory = rpcContext.getProxyFactory();
+            BoboClient client = (BoboClient)map.values().iterator().next();
+            proxyFactory = (ProxyFactory)client;
         }
     }
 }

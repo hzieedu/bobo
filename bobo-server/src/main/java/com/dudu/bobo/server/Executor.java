@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.dudu.bobo.common.Node;
 import com.dudu.bobo.common.Message;
+import com.dudu.bobo.common.Lifecycle;
 
 /**
  * 

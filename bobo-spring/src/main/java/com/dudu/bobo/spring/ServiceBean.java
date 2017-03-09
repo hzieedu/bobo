@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
 
-import com.dudu.bobo.server.support.ServiceFramework;
+import com.dudu.bobo.server.support.BoboServer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -48,9 +48,9 @@ public class ServiceBean<T> implements InitializingBean, ApplicationContextAware
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-        Map map = applicationContext.getBeansOfType(ServiceFramework.class);
+        Map map = applicationContext.getBeansOfType(BoboServer.class);
         if (map.values().isEmpty() == false) {
-            ServiceFramework framework = (ServiceFramework)map.values().iterator().next();            
+            BoboServer framework = (BoboServer)map.values().iterator().next();            
             ref = (T)applicationContext.getBean(implementationBean);
             interfaceClass = (Class<T>) Class.forName(interfaceName);
             framework.export(this.ref, interfaceClass);

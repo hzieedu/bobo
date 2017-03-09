@@ -6,7 +6,7 @@
 
 package com.dudu.boboserverdemo;
 
-import com.dudu.bobo.server.support.ServiceFramework;
+import com.dudu.bobo.server.support.BoboServer;
 import com.dudu.bobo.demo.intf.DemoService;
 
 /**
@@ -16,11 +16,11 @@ import com.dudu.bobo.demo.intf.DemoService;
 public class BoboServerDemoWithoutSpring {
     
     public static void main(String[] args) throws Exception {
-		ServiceFramework framework = ServiceFramework.getServiceFramework();
+		BoboServer server = BoboServer.getBoboServer();
 		
-		framework.startServing();
+		server.startServing();
 		
-        framework.export(new DemoServiceImpl(), DemoService.class);
+        server.export(new DemoServiceImpl(), DemoService.class);
         
 		System.in.read();
     }

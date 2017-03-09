@@ -14,7 +14,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-import com.dudu.bobo.client.support.RpcContext;
+import com.dudu.bobo.client.support.BoboClient;
 
 /**
  *
@@ -22,7 +22,7 @@ import com.dudu.bobo.client.support.RpcContext;
  */
 public class ClientBeanDefinitionParser implements BeanDefinitionParser {
     
-    private final Class<?> beanClass = RpcContext.class;
+    private final Class<?> beanClass = BoboClient.class;
 
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
@@ -30,7 +30,7 @@ public class ClientBeanDefinitionParser implements BeanDefinitionParser {
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
         parserContext.getRegistry().registerBeanDefinition("boboClient-" + new Random().nextLong(), beanDefinition);
-        beanDefinition.setFactoryMethodName("getRpcContext");
+        beanDefinition.setFactoryMethodName("getBoboClient");
         beanDefinition.setInitMethodName("start");
         return beanDefinition;
     }

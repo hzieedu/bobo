@@ -3,19 +3,16 @@ package com.dudu.bobo.client.support;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
 
-import com.dudu.bobo.client.ProxyFactory;
 import com.dudu.bobo.client.RpcStub;
 import com.dudu.bobo.common.Node;
 import com.dudu.bobo.common.RpcRequest;
 import com.dudu.bobo.common.RpcResponse;
 
-public class ProxyFactoryImpl implements ProxyFactory {
+public class ProxyFactoryImpl {
 
-    @Override
     @SuppressWarnings("unchecked")
-    public <T> T refer(Class<T> interfaceClass) throws Exception {
+    public static <T> T refer(Class<T> interfaceClass) throws Exception {
         System.out.println("creating remote service stub" + interfaceClass.getName());
         return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
             new Class<?>[]{interfaceClass},
@@ -23,14 +20,14 @@ public class ProxyFactoryImpl implements ProxyFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T referBypass(Class<T> interfaceClass, Node server) throws Exception {
+    public static <T> T referBypass(Class<T> interfaceClass, Node server) throws Exception {
         System.out.println("creating remote service stub" + interfaceClass.getName());
         return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
             new Class<?>[]{interfaceClass},
             new RpcHandleWrapper(interfaceClass, server));
     }
 
-    class RpcHandleWrapper implements InvocationHandler {
+    static class RpcHandleWrapper implements InvocationHandler {
         private RpcStub stub;
 
         public RpcHandleWrapper(Class<?> interfaceClass) {

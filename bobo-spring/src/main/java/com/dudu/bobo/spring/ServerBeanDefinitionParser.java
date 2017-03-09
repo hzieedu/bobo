@@ -14,14 +14,14 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-import com.dudu.bobo.server.support.ServiceFramework;
+import com.dudu.bobo.server.support.BoboServer;
 
 /**
  *
  * @author liangy43
  */
 public class ServerBeanDefinitionParser implements BeanDefinitionParser {
-    private final Class<?> beanClass = ServiceFramework.class;
+    private final Class<?> beanClass = BoboServer.class;
     
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
@@ -29,7 +29,7 @@ public class ServerBeanDefinitionParser implements BeanDefinitionParser {
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
         parserContext.getRegistry().registerBeanDefinition("boboServer-" + new Random().nextLong(), beanDefinition);
-        beanDefinition.setFactoryMethodName("getServiceFramework");
+        beanDefinition.setFactoryMethodName("getBoboServer");
         beanDefinition.setInitMethodName("startServing");
         return beanDefinition;
     }    

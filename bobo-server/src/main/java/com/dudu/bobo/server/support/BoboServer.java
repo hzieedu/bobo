@@ -15,20 +15,20 @@ import com.dudu.bobo.server.ServiceRegister;
  * @author liangy43
  *
  */
-public class ServiceFramework {
+public class BoboServer {
 
-    private static volatile ServiceFramework instance = null;
+    private static volatile BoboServer instance = null;
 
-    private ServiceFramework() {    
+    private BoboServer() {    
     }
 
-    public static ServiceFramework getServiceFramework() {
+    public static BoboServer getBoboServer() {
         /*
          * double check lock
          */
         if (instance == null) {
             synchronized (NioServingConnector.class) {
-                ServiceFramework server = new ServiceFramework();   
+                BoboServer server = new BoboServer();   
                 instance = server;
                 return instance;
             }
@@ -51,7 +51,7 @@ public class ServiceFramework {
         String hostName = "0.0.0.0";
         String port = "28800";
         try  {
-        	InputStream in = ServiceFramework.class.getResourceAsStream("/server.properties");
+        	InputStream in = BoboServer.class.getResourceAsStream("/server.properties");
         	if (in != null) {
 	            prop.load(in);
 	            hostName = prop.getProperty("ip").trim();
